@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { DisclaimerNotice } from "@/components/DisclaimerProvider";
+import HowToUse from "@/components/HowToUse";
 
 const examples = [
   {
@@ -19,9 +21,12 @@ export default function HomePage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-8">
       <section className="flex flex-1 flex-col justify-center">
-        <p className="mb-3 inline-flex w-fit rounded-full bg-mint px-3 py-1 text-sm font-bold text-emerald-900">
-          潜台词解读器
-        </p>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="inline-flex w-fit rounded-full bg-mint px-3 py-1 text-sm font-bold text-emerald-900">
+            潜台词解读器
+          </p>
+          <HowToUse compact />
+        </div>
         <h1 className="text-5xl font-black leading-tight tracking-normal">TA 到底什么意思？</h1>
         <p className="mt-4 text-lg leading-relaxed text-neutral-700">
           输入一句话，看看 TA 可能藏着什么潜台词。
@@ -44,9 +49,7 @@ export default function HomePage() {
         ))}
       </section>
 
-      <p className="text-center text-xs text-neutral-500">
-        数据仅保存在当前浏览器 cookie 中。结果仅为 AI 视角模拟，不代表真实心理判断。
-      </p>
+      <DisclaimerNotice />
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import HowToUse from "@/components/HowToUse";
 import InterpretPanel from "@/components/InterpretPanel";
 import { getCharacter, getHistory } from "@/lib/cookie-store";
 import type { Character, Interpretation } from "@/lib/types";
@@ -28,9 +29,12 @@ export default function CharacterDetailPage() {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-md px-5 py-6">
-      <Link href="/characters" className="text-sm font-bold text-neutral-500">
-        返回对象列表
-      </Link>
+      <div className="flex items-center justify-between gap-3">
+        <Link href="/characters" className="text-sm font-bold text-neutral-500">
+          返回对象列表
+        </Link>
+        <HowToUse compact />
+      </div>
       <div className="mt-5">
         {ready && character ? (
           <InterpretPanel character={character} initialHistory={history} />

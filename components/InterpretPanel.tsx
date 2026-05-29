@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Avatar from "@/components/Avatar";
+import { DisclaimerNotice, useDisclaimer } from "@/components/DisclaimerProvider";
 import HistoryList from "@/components/HistoryList";
 import InterpretationCards, { resultToText } from "@/components/InterpretationCards";
 import { addInterpretation } from "@/lib/cookie-store";
@@ -22,9 +23,12 @@ export default function InterpretPanel({
   const [copied, setCopied] = useState(false);
   const [result, setResult] = useState<Interpretation | null>(null);
   const [history, setHistory] = useState(initialHistory);
+  const { ensureAccepted } = useDisclaimer();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!ensureAccepted()) return;
+
     setLoading(true);
     setError("");
     setCopied(false);
@@ -142,7 +146,7 @@ export default function InterpretPanel({
 
       <HistoryList items={history} />
 
-      <p className="pb-8 text-center text-xs text-neutral-500">结果仅为 AI 视角模拟，不代表真实心理判断。</p>
+      <DisclaimerNotice className="pb-8" />
     </div>
   );
 }

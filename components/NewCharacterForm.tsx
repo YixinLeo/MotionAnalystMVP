@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDisclaimer } from "@/components/DisclaimerProvider";
 import { createCharacter, getCharacters } from "@/lib/cookie-store";
 import {
   genderOptions,
@@ -14,11 +15,14 @@ import type { Gender, Relationship } from "@/lib/types";
 
 export default function NewCharacterForm({ initialCount }: { initialCount: number }) {
   const router = useRouter();
+  const { ensureAccepted } = useDisclaimer();
   const [error, setError] = useState(initialCount >= 5 ? "免费版最多创建 5 个关系对象。" : "");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!ensureAccepted()) return;
+
     if (initialCount >= 5) return;
 
     setLoading(true);

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CharacterCard from "@/components/CharacterCard";
+import { DisclaimerNotice } from "@/components/DisclaimerProvider";
+import HowToUse from "@/components/HowToUse";
 import { deleteAllLocalData, getCharacters } from "@/lib/cookie-store";
 import type { Character } from "@/lib/types";
 
@@ -28,17 +30,20 @@ export default function CharactersPage() {
           <p className="text-sm font-bold text-coral">TA 到底什么意思？</p>
           <h1 className="text-3xl font-black">关系对象</h1>
         </div>
-        {items.length > 0 ? (
-          <button
-            type="button"
-            onClick={clearData}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm"
-            aria-label="清空本机数据"
-            title="清空本机数据"
-          >
-            <Trash2 size={18} />
-          </button>
-        ) : null}
+        <div className="flex items-center gap-2">
+          <HowToUse compact />
+          {items.length > 0 ? (
+            <button
+              type="button"
+              onClick={clearData}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm"
+              aria-label="清空本机数据"
+              title="清空本机数据"
+            >
+              <Trash2 size={18} />
+            </button>
+          ) : null}
+        </div>
       </header>
 
       <section className="mt-6 space-y-3">
@@ -67,9 +72,7 @@ export default function CharactersPage() {
         )}
       </div>
 
-      <p className="pb-4 text-center text-xs text-neutral-500">
-        数据仅保存在当前浏览器 cookie 中。结果仅为 AI 视角模拟，不代表真实心理判断。
-      </p>
+      <DisclaimerNotice className="pb-4" />
     </main>
   );
 }
