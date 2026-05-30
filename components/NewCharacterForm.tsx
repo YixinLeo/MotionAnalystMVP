@@ -17,7 +17,7 @@ export default function NewCharacterForm({ initialCount }: { initialCount: numbe
   const router = useRouter();
   const { ensureAccepted } = useDisclaimer();
   const [error, setError] = useState(initialCount >= 5 ? "免费版最多创建 5 个关系对象。" : "");
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -25,14 +25,14 @@ export default function NewCharacterForm({ initialCount }: { initialCount: numbe
 
     if (initialCount >= 5) return;
 
-    setLoading(true);
+    setStatus("creating");
     setError("");
 
     const form = new FormData(event.currentTarget);
     const currentCount = getCharacters().length;
 
     if (currentCount >= 5) {
-      setLoading(false);
+      setStatus("idle");
       setError("免费版最多创建 5 个关系对象。");
       return;
     }
@@ -50,19 +50,31 @@ export default function NewCharacterForm({ initialCount }: { initialCount: numbe
         avatar_config: { relationship }
       });
 
-      setLoading(false);
+      setStatus("success");
+      await new Promise((resolve) => setTimeout(resolve, 650));
       router.push(`/characters/${character.id}`);
       router.refresh();
     } catch (error) {
-      setLoading(false);
+      setStatus("idle");
       setError(error instanceof Error ? error.message : "创建失败，请稍后再试。");
     }
   }
 
-  const disabled = initialCount >= 5 || loading;
+  const disabled = initialCount >= 5 || status !== "idle";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-neutral-200 bg-white p-5 shadow-card">
+    <form
+      onSubmit={handleSubmit}
+      aria-busy={status === "creating"}
+      className="relative overflow-hidden rounded-lg border border-neutral-200 bg-white p-5 shadow-card"
+    >
+      {status === "creating" ? (
+        <div className="absolute inset-x-0 top-0 h-1 overflow-hidden bg-coral/10">
+          <div className="h-full w-1/2 animate-character-progress rounded-r-full bg-coral" />
+        </div>
+      ) : null}
+
+      <div className="space-y-4">
       <label className="block">
         <span className="text-sm font-bold">名称</span>
         <input
@@ -119,10 +131,16 @@ export default function NewCharacterForm({ initialCount }: { initialCount: numbe
       </label>
 
       {error ? <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">{error}</p> : null}
+      {status === "success" ? (
+        <p className="rounded-lg bg-mint p-3 text-sm font-bold text-emerald-900">
+          形象创建好了，马上开始解读。
+        </p>
+      ) : null}
 
       <button disabled={disabled} className="w-full rounded-lg bg-ink px-4 py-3 font-black text-white disabled:opacity-50">
-        {loading ? "正在创建..." : "创建并开始解读"}
+        {status === "creating" ? "正在创建形象..." : status === "success" ? "创建成功" : "创建并开始解读"}
       </button>
+      </div>
     </form>
   );
 }
