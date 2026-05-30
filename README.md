@@ -17,3 +17,12 @@ npm run dev
 DeepSeek API 只在服务端 `app/api/interpret/route.ts` 中调用，不会暴露到前端。
 
 Supabase 相关文件仍保留在仓库里，方便之后切回登录版；当前 cookie 分支不需要配置 Supabase。
+
+## EdgeOne Pages 部署
+
+生产环境需要配置：
+
+- `DEEPSEEK_API_KEY`：DeepSeek API Key
+- `RATE_LIMIT_KV`：EdgeOne Pages KV 绑定名，用于按 IP + User-Agent 限制每天 20 次解读
+
+限流逻辑在 `/api/interpret` 服务端执行：读取 IP 和 User-Agent，生成当天 key，超过 20 次直接返回“作者的 AI Token 快被薅秃了”，DeepSeek 调用成功后才计数 +1。清除浏览器 cookie 不会重置次数。

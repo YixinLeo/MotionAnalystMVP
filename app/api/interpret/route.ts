@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildInterpretPrompt, callDeepSeek } from "@/lib/deepseek";
+import { checkDailyRateLimit } from "@/lib/rate-limit";
 import type { Character, Interpretation } from "@/lib/types";
 
 const NO_TOKEN_MESSAGE = "作者没有 Token了，请给他发邮件让他充 token";
@@ -27,11 +28,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "没有找到这个关系对象。" }, { status: 404 });
     }
 
+    const rateLimit = await checkDailyRateLimit(request);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "作者的 AI Token 快被薅秃了" },
+        { status: 429 }
+      );
+    }
+
     const history = [...(body.history ?? [])].slice(-10);
     const prompt = buildInterpretPrompt({ character, history, otherText, optionalContext });
     const output = await callDeepSeek(prompt);
+    await rateLimit.commit();
 
-    return NextResponse.json({ output });
+    return NextResponse.json({
+      output,
+      rateLimit: {
+        remaining: rateLimit.remaining,
+        limit: rateLimit.limit,
+        resetDate: rateLimit.resetDate
+      }
+    });
   } catch (error) {
     console.error(error);
     const message = error instanceof Error ? error.message : "";

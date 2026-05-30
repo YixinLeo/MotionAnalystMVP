@@ -23,6 +23,7 @@ export default function InterpretPanel({
   const [copied, setCopied] = useState(false);
   const [result, setResult] = useState<Interpretation | null>(null);
   const [history, setHistory] = useState(initialHistory);
+  const [rateLimit, setRateLimit] = useState<{ remaining: number; limit: number } | null>(null);
   const { ensureAccepted } = useDisclaimer();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -55,6 +56,7 @@ export default function InterpretPanel({
     const payload = (await response.json()) as {
       interpretation?: Interpretation;
       output?: InterpretationOutput;
+      rateLimit?: { remaining: number; limit: number; resetDate: string };
       error?: string;
     };
 
@@ -78,6 +80,9 @@ export default function InterpretPanel({
     addInterpretation(character.id, saved);
     setResult(saved);
     setHistory((items) => [saved, ...items].slice(0, 10));
+    if (payload.rateLimit) {
+      setRateLimit({ remaining: payload.rateLimit.remaining, limit: payload.rateLimit.limit });
+    }
     setOtherText("");
     setOptionalContext("");
   }
@@ -135,6 +140,11 @@ export default function InterpretPanel({
         <button disabled={loading} className="w-full rounded-lg bg-coral px-4 py-3 font-black text-white disabled:opacity-60">
           {loading ? "正在分析 TA 的潜台词..." : "解读潜台词"}
         </button>
+        {rateLimit ? (
+          <p className="text-center text-xs font-bold text-neutral-500">
+            今日还剩 {rateLimit.remaining} / {rateLimit.limit} 次
+          </p>
+        ) : null}
       </form>
 
       {result ? (
