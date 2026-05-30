@@ -27,6 +27,10 @@ export async function checkDailyRateLimit(request: Request): Promise<RateLimitRe
   const isLocal = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
 
   if (!kv && !isLocal) {
+    if (process.env.RATE_LIMIT_KV) {
+      throw new Error("RATE_LIMIT_KV 不能填成普通环境变量；请绑定 EdgeOne KV 命名空间。次数 20 请填 DAILY_INTERPRET_LIMIT。");
+    }
+
     throw new Error("限流存储未配置：请在 EdgeOne Pages 绑定 KV 变量 RATE_LIMIT_KV。");
   }
 

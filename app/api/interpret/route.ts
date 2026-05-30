@@ -5,6 +5,8 @@ import type { Character, Interpretation } from "@/lib/types";
 
 const NO_TOKEN_MESSAGE = "作者没有 Token了，请给他发邮件让他充 token";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {

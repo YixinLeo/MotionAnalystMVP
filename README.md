@@ -23,6 +23,7 @@ Supabase 相关文件仍保留在仓库里，方便之后切回登录版；当�
 生产环境需要配置：
 
 - `DEEPSEEK_API_KEY`：DeepSeek API Key
-- `RATE_LIMIT_KV`：EdgeOne Pages KV 绑定名，用于按 IP + User-Agent 限制每天 20 次解读
+- `RATE_LIMIT_KV`：EdgeOne Pages KV 命名空间绑定名，用于按 IP + User-Agent 限制每天 20 次解读。它不是普通字符串环境变量，不能填 `20`
+- `DAILY_INTERPRET_LIMIT`：可选，普通环境变量，默认 `20`
 
 限流逻辑在 `/api/interpret` 服务端执行：读取 IP 和 User-Agent，生成当天 key，超过 20 次直接返回“作者的 AI Token 快被薅秃了”，DeepSeek 调用成功后才计数 +1。清除浏览器 cookie 不会重置次数。
